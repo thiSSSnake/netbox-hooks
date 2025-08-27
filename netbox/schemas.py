@@ -29,6 +29,7 @@ class DeviceType(BaseModel):
     model: str
     slug: str
     display: str
+    custom_fields: Optional[Dict[str, Any]] = Field(default_factory=dict)
 
 
 class DeviceIPAddress(BaseModel):
@@ -46,13 +47,10 @@ class DeviceData(BaseModel):
     id: int
     url: str
     name: str
-    # display: str
     status: DeviceStatus
     device_type: DeviceType
     site: Optional[DeviceSite] = None
-    # serial: str
     primary_ip4: Optional[DeviceIPAddress] = None
-    # comments: Optional[str] = None
     custom_fields: Optional[Dict[str, Any]] = Field(default_factory=dict)
 
 
