@@ -1,6 +1,7 @@
+import pprint
 from netbox.schemas import *
 from fastapi import APIRouter
-from netbox.services import update_device_info
+from netbox.services import update_device_info, create_device
 
 router = APIRouter()
 
@@ -26,8 +27,7 @@ async def handle_netbox_webhook(webhook_data: NetboxWebhook):
         print(
             f"Event 'created' for device: {webhook_data.data.name}/IP:{ip_address}. Creating host on Zabbix."
         )
-        # host = zabbix.get_host_by_name(webhook_data.data.name)
-        # return host
+        create_device(webhook_data)
 
     elif webhook_data.event == "updated":
         # Логика обновления хоста в Zabbix
