@@ -129,6 +129,21 @@ def get_device_name(webhook_data: NetboxWebhook):
     return device_name
 
 
+def get_or_create_hostgroup(webhook_data: NetboxWebhook):
+    """
+    Логика получения либо создания хост-группы
+
+    :param webhook_data: Экземлпяр NetboxWebhook, содержащий данный от Netbox.
+    """
+    hostgroup_name = get_hostgroup_name(webhook_data)
+    hostgroup_id = (
+        zabbix.get_hostgroup(hostgroup_name)
+        if zabbix.get_hostgroup(hostgroup_name)
+        else zabbix.create_hostgroup(hostgroup_name)
+    )
+    return hostgroup_id
+
+
 def create_device(webhook_data: NetboxWebhook):
     """
     Логика добавления хоста в Zabbix
@@ -139,8 +154,7 @@ def create_device(webhook_data: NetboxWebhook):
     ip_address = get_ip_address(webhook_data)
     device_name = get_device_name(webhook_data)
     status = get_device_status(webhook_data)
-    hostgroup_name = get_hostgroup_name(webhook_data)
-    hostgroup_id = zabbix.create_hostgroup(hostgroup_name)
+    hostgroup_id = get_or_create_hostgroup(webhook_data)
     template_id = get_template_id(webhook_data)
     try:
         hostid = zabbix.create_host(
@@ -156,13 +170,12 @@ def create_device(webhook_data: NetboxWebhook):
         print(f"Error: {e}")
 
 
-def update_device_info(webhook_data: NetboxWebhook):
+def update_device(webhook_data: NetboxWebhook):
     """
     Логика обновления хоста в Zabbix
 
     :param webhook_data: Экземпляр NetboxWebhook, содержащий данные от Netbox.
     """
-    hostgroup_name = get_hostgroup_name(webhook_data)
     try:
         ip_address = get_ip_address(webhook_data)
         template_id = get_template_id(webhook_data)
@@ -171,6 +184,7 @@ def update_device_info(webhook_data: NetboxWebhook):
         host_info = zabbix.get_host_by_hostid(
             webhook_data.data.custom_fields.get("zabbix_hostid")
         )
+        hostgroup_id = get_or_create_hostgroup(webhook_data)
 
         if host_info:
             interface_id = zabbix.get_interface_id(host_info)
@@ -181,6 +195,11 @@ def update_device_info(webhook_data: NetboxWebhook):
                 interface_id=interface_id,
                 status=status,
                 name=device_name,
+                hostgroup_id=hostgroup_id,
             )
     except Exception as e:
         print(f"Error: {e}")
+
+
+def delete_device():
+    pass

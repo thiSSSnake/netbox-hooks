@@ -67,6 +67,19 @@ class ZabbixAPIClient(Utils):
         template_id = template[0]["templateid"]
         return template_id
 
+    def get_hostgroup(self, name: str):
+        """
+        Получение ID хост-группы.
+        """
+        try:
+            response = self.zabbix.hostgroup.get(filter={"name": name})
+            if response:
+                return [{"groupid": response[0]["groupid"]}]
+            else:
+                return False
+        except (APIRequestError, ProcessingError) as e:
+            raise Exception(f"Failed to fetch Zabbix hostgroup: {e}")
+
     def create_hostgroup(self, name: str):
         """
         Создание новой хост-группы
@@ -123,6 +136,7 @@ class ZabbixAPIClient(Utils):
         interface_id: str,
         status: int,
         name: str,
+        hostgroup_id: list,
     ):
         """Обновление хоста по hostid"""
         try:
@@ -130,6 +144,7 @@ class ZabbixAPIClient(Utils):
                 hostid=host_id,
                 status=status,
                 name=name,
+                groups=hostgroup_id,
                 interfaces=[
                     {
                         "interfaceid": interface_id,

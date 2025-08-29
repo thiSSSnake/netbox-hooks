@@ -1,7 +1,7 @@
 import pprint
 from netbox.schemas import *
 from fastapi import APIRouter
-from netbox.services import update_device_info, create_device
+from netbox.services import update_device, create_device
 
 router = APIRouter()
 
@@ -34,7 +34,7 @@ async def handle_netbox_webhook(webhook_data: NetboxWebhook):
         print(
             f"Event 'updated' for device: {webhook_data.data.name}/IP:{ip_address}. Updating host on Zabbix."
         )
-        update_device_info(webhook_data)
+        update_device(webhook_data)
 
     elif webhook_data.event == "deleted":
         # Логика удаление хоста в Zabbix
