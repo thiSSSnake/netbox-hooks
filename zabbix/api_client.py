@@ -165,3 +165,12 @@ class ZabbixAPIClient(Utils):
             print(f"Successfully updated Zabbix host with id {host_id}")
         except (APIRequestError, ProcessingError) as e:
             raise Exception(f"Failed to update Zabbix host: {e}")
+
+    def delete_host_by_id(self, host_id: str):
+        """
+        Удаление хоста в Zabbix по host_id
+        """
+        try:
+            self.zabbix.host.delete(hostid=host_id)
+        except (APIRequestError, ProcessingError) as e:
+            raise Exception(f"Failed to update Zabbix host: {e}")

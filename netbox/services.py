@@ -1,5 +1,7 @@
 import os
 import pprint
+
+from fastapi.responses import JSONResponse
 from .schemas import NetboxWebhook
 from dotenv import load_dotenv
 from zabbix.api_client import ZabbixAPIClient
@@ -205,5 +207,15 @@ def update_device(webhook_data: NetboxWebhook):
         print(f"Error: {e}")
 
 
-def delete_device():
-    pass
+def delete_device(webhook_data: NetboxWebhook):
+    """
+    Удаление устройства в Zabbix
+
+    :param webhook_data: Экземпляр NetboxWebhook, содержащий данные от Netbox.
+    """
+    host_info = zabbix.get_host_by_hostid(
+        webhook_data.data.custom_fields.get("zabbix_hostid")
+    )
+    if host_info:
+        host_id = host_info["hostid"]
+        zabbix.delete_host_by_id(host_id=host_id)
