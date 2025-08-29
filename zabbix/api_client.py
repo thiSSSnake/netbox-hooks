@@ -74,7 +74,7 @@ class ZabbixAPIClient(Utils):
         try:
             response = self.zabbix.hostgroup.get(filter={"name": name})
             if response:
-                return [{"groupid": response[0]["groupid"]}]
+                return {"groupid": response[0]["groupid"]}
             else:
                 return False
         except (APIRequestError, ProcessingError) as e:
@@ -89,7 +89,7 @@ class ZabbixAPIClient(Utils):
             print(
                 f"Successfully created Zabbix hostgroup with id {response['groupids'][0]}"
             )
-            return [{"groupid": response["groupids"][0]}]
+            return {"groupid": response["groupids"][0]}
         except (APIRequestError, ProcessingError) as e:
             raise Exception(f"Failed to create Zabbix hostgroup: {e}")
 
@@ -99,14 +99,14 @@ class ZabbixAPIClient(Utils):
         status: int,
         template_id: str,
         ip: str,
-        hostgroup_id: list,
+        hostgroup_ids: list,
     ):
         """Создание хоста в Zabbix"""
         try:
             response = self.zabbix.host.create(
                 host=name,
                 status=status,
-                groups=hostgroup_id,
+                groups=hostgroup_ids,
                 interfaces=[
                     {
                         "type": 2,
@@ -136,7 +136,7 @@ class ZabbixAPIClient(Utils):
         interface_id: str,
         status: int,
         name: str,
-        hostgroup_id: list,
+        hostgroup_ids: list,
     ):
         """Обновление хоста по hostid"""
         try:
@@ -144,7 +144,7 @@ class ZabbixAPIClient(Utils):
                 hostid=host_id,
                 status=status,
                 name=name,
-                groups=hostgroup_id,
+                groups=hostgroup_ids,
                 interfaces=[
                     {
                         "interfaceid": interface_id,

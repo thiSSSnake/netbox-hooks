@@ -94,7 +94,8 @@ def get_hostgroup_name(webhook_data: NetboxWebhook):
     """
     site_info = get_site_info(webhook_data)
     regions = get_region_info(site_data=site_info)
-    return "-".join(regions[:-1])
+    return regions
+    # return "-".join(regions[:-1])
 
 
 def get_template_id(webhook_data: NetboxWebhook):
@@ -135,13 +136,16 @@ def get_or_create_hostgroup(webhook_data: NetboxWebhook):
 
     :param webhook_data: Экземлпяр NetboxWebhook, содержащий данный от Netbox.
     """
-    hostgroup_name = get_hostgroup_name(webhook_data)
-    hostgroup_id = (
-        zabbix.get_hostgroup(hostgroup_name)
-        if zabbix.get_hostgroup(hostgroup_name)
-        else zabbix.create_hostgroup(hostgroup_name)
-    )
-    return hostgroup_id
+    hostgroup_names = get_hostgroup_name(webhook_data)
+    hostgroup_ids = []
+    for hostgroup_name in hostgroup_names:
+        hostgroup_ids.append(
+            zabbix.get_hostgroup(hostgroup_name)
+            if zabbix.get_hostgroup(hostgroup_name)
+            else zabbix.create_hostgroup(hostgroup_name)
+        )
+    print(hostgroup_ids)
+    return hostgroup_ids
 
 
 def create_device(webhook_data: NetboxWebhook):
@@ -154,7 +158,7 @@ def create_device(webhook_data: NetboxWebhook):
     ip_address = get_ip_address(webhook_data)
     device_name = get_device_name(webhook_data)
     status = get_device_status(webhook_data)
-    hostgroup_id = get_or_create_hostgroup(webhook_data)
+    hostgroup_ids = get_or_create_hostgroup(webhook_data)
     template_id = get_template_id(webhook_data)
     try:
         hostid = zabbix.create_host(
@@ -162,7 +166,7 @@ def create_device(webhook_data: NetboxWebhook):
             status=status,
             template_id=template_id,
             ip=ip_address,
-            hostgroup_id=hostgroup_id,
+            hostgroup_ids=hostgroup_ids,
         )
 
         netbox.set_custom_fields(url=url, custom_fields={"zabbix_hostid": hostid})
@@ -184,7 +188,7 @@ def update_device(webhook_data: NetboxWebhook):
         host_info = zabbix.get_host_by_hostid(
             webhook_data.data.custom_fields.get("zabbix_hostid")
         )
-        hostgroup_id = get_or_create_hostgroup(webhook_data)
+        hostgroup_ids = get_or_create_hostgroup(webhook_data)
 
         if host_info:
             interface_id = zabbix.get_interface_id(host_info)
@@ -195,7 +199,7 @@ def update_device(webhook_data: NetboxWebhook):
                 interface_id=interface_id,
                 status=status,
                 name=device_name,
-                hostgroup_id=hostgroup_id,
+                hostgroup_ids=hostgroup_ids,
             )
     except Exception as e:
         print(f"Error: {e}")
