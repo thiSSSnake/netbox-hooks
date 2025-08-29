@@ -69,7 +69,6 @@ To enable synchronization, you need to configure a webhook in Netbox to send dev
    - **Events**: Check `Create`, `Update`, and `Delete`.
    - **URL**: Set to `http://<microservice-host>:8000/webhook` (replace `<microservice-host>` with the appropriate host).
    - **HTTP Method**: POST
-   - **Secret**: Use the same `WEBHOOK_SECRET` value from your `.env` file.
    - **Enabled**: Check to enable the webhook.
 3. Save the webhook.
 
