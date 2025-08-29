@@ -1,7 +1,7 @@
 import pprint
-from netbox.schemas import *
+from app.netbox.schemas import *
 from fastapi import APIRouter
-from netbox.services import update_device, create_device, delete_device
+from app.netbox.services import update_device, create_device, delete_device
 
 router = APIRouter()
 
