@@ -1,4 +1,3 @@
-import pprint
 from app.netbox.schemas import *
 from fastapi import APIRouter
 from app.netbox.services import update_device, create_device, delete_device

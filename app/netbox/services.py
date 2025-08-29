@@ -1,7 +1,5 @@
 import os
-import pprint
 
-from fastapi.responses import JSONResponse
 from .schemas import NetboxWebhook
 from dotenv import load_dotenv
 from app.zabbix.api_client import ZabbixAPIClient
