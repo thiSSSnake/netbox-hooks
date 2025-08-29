@@ -4,8 +4,8 @@ import pprint
 from fastapi.responses import JSONResponse
 from .schemas import NetboxWebhook
 from dotenv import load_dotenv
-from zabbix.api_client import ZabbixAPIClient
-from netbox.api_client import NetBoxClient
+from app.zabbix.api_client import ZabbixAPIClient
+from app.netbox.api_client import NetBoxClient
 
 load_dotenv()
 
@@ -32,13 +32,15 @@ def get_ip_address(webhook_data: NetboxWebhook):
     return ip_address
 
 
-# TODO: Это костыль, необходимо переписать.
 def normalize_url(url: str) -> str:
     """
     Нормализация url для доступа к api методу.
+    Возвращает относительный путь, начиная с "/api/".
     """
-    correct_url = url[21:]
-    return correct_url
+    api_path_start = url.find("/api/")
+    if api_path_start != -1:
+        return url[api_path_start:]
+    return ""
 
 
 def get_parent_region(region: dict) -> list[str]:
